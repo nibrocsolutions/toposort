@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>First Light</title>
+  <meta name="description" content="A night bench where every legal way to assemble an orrery is a topological sort.">
+  <meta name="theme-color" content="#0b1020">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="brand">
+        <p class="eyebrow">Greenwich · the night bench</p>
+        <h1>First Light</h1>
+      </div>
+      <p class="thesis">Some things must precede others. A topological sort is any total order that obeys all of those constraints, and does what it likes with the rest.</p>
+    </header>
+    <main>
+      <section class="stage" aria-label="The instrument">
+        <div class="stage-head">
+          <p class="eyebrow" id="kicker">Assembly</p>
+          <h2 id="stage-title">The Queen's Desk Orrery</h2>
+        </div>
+        <div class="sky-frame" id="sky-frame">
+          <svg id="sky" viewBox="0 0 1000 760" role="img" aria-labelledby="sky-label" preserveAspectRatio="xMidYMid meet">
+            <title id="sky-label">The night bench</title>
+          </svg>
+        </div>
+        <div class="mesh-head">
+          <h3>The partial order</h3>
+          <p>An arrow runs from what must come first toward what waits. Left is earlier. A dashed arrow bends backward — that is a ring, or the start of one.</p>
+        </div>
+        <div class="mesh-scroll">
+          <svg id="mesh" role="img" aria-label="Dependency graph"></svg>
+        </div>
+        <ul class="legend">
+          <li><i class="swatch ready"></i>Ready</li>
+          <li><i class="swatch seated"></i>Seated</li>
+          <li><i class="swatch cycle"></i>In a ring</li>
+        </ul>
+      </section>
+      <aside class="ledger" aria-label="The ledger">
+        <div class="ledger-inner">
+          <label class="field">Commission
+            <select id="commission"></select>
+          </label>
+          <p id="summary"></p>
+          <p id="status" role="status"></p>
+          <div class="controls">
+            <button type="button" id="step" class="primary">Step</button>
+            <button type="button" id="run">Run</button>
+            <button type="button" id="reset">Reset the night</button>
+            <label class="check"><input type="checkbox" id="brisk"> Brisk</label>
+          </div>
+          <p id="method-note" class="quiet"></p>
+          <fieldset>
+            <legend>When several pieces are free</legend>
+            <label><input type="radio" name="policy" value="hand" checked> Wait for a hand</label>
+            <label><input type="radio" name="policy" value="ledger"> Oldest in the queue</label>
+            <label><input type="radio" name="policy" value="clerk"> First by name</label>
+          </fieldset>
+          <fieldset>
+            <legend>Which algorithm</legend>
+            <label><input type="radio" name="method" value="kahn" checked> Kahn's queue</label>
+            <label><input type="radio" name="method" value="dfs"> Finishing chalk</label>
+          </fieldset>
+          <h3 id="work-title">Ready now</h3>
+          <div id="work" class="tokens"></div>
+          <h3 id="algo-title">Kahn's algorithm</h3>
+          <ol id="program" class="slate"></ol>
+          <h3 id="order-title">The dawn so far</h3>
+          <ol id="order"></ol>
+          <div id="chalk-wrap" hidden>
+            <h3>Chalk, earliest finish first</h3>
+            <ol id="chalk"></ol>
+          </div>
+          <p id="proof"></p>
+          <h3>Where a hand was free</h3>
+          <ul id="choices"></ul>
+          <details>
+            <summary>Two mechanicians</summary>
+            <div id="compare"></div>
+          </details>
+          <h3>How many dawns</h3>
+          <button type="button" id="count">Count the legal dawns</button>
+          <p id="count-result"></p>
+          <details>
+            <summary>How the count is computed</summary>
+            <p>Each subset of pieces that could be a prefix of a legal dawn gets one number: how many ways to reach it. A piece may be added only when everything it waits on is already inside. The number on the full set is the count of topological sorts, the linear extensions of this partial order. With no bearings the bench uses n! directly, which is the same number the table would give. A ring short-circuits the table: the count is zero. Above 20 pieces the table is refused.</p>
+          </details>
+          <h3>Bearings still open</h3>
+          <table>
+            <thead>
+              <tr><th>Piece</th><th>Waiting</th><th>State</th></tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+          <h3>On the bench</h3>
+          <div id="inspector"></div>
+          <h3>Lay a new piece</h3>
+          <form id="new-piece" class="stack-form">
+            <label class="grow">Name
+              <input id="piece-name" name="name" maxlength="42" placeholder="A pinion, a bell, a night" required autocomplete="off">
+            </label>
+            <label>Kind
+              <select id="piece-kind" name="kind">
+                <option value="gear">Gear</option>
+                <option value="wheel">Wheel</option>
+                <option value="planet">Planet</option>
+                <option value="moon">Moon</option>
+                <option value="sun">Sun</option>
+                <option value="bell">Bell</option>
+                <option value="hand">Hand</option>
+                <option value="note">Note</option>
+                <option value="stone">Stone</option>
+                <option value="arbor">Arbor</option>
+                <option value="lamp">Lamp</option>
+                <option value="gate">Gate</option>
+              </select>
+            </label>
+            <button type="submit">Lay it on the bench</button>
+          </form>
+          <h3>Set a bearing</h3>
+          <form id="new-bearing" class="stack-form">
+            <label>This
+              <select id="prereq" required></select>
+            </label>
+            <span class="bearing-word">must be seated before</span>
+            <label>This
+              <select id="dependent" required></select>
+            </label>
+            <button type="submit">Set the bearing</button>
+          </form>
+          <p class="quiet">A piece may wait on itself. That is a ring of one, and the count of dawns becomes zero.</p>
+          <button type="button" id="restore">Restore this commission</button>
+          <details class="possibilities">
+            <summary>Where else this pattern shows up</summary>
+            <ul>
+              <li>A build compiles a file after the files it imports.</li>
+              <li>A spreadsheet recomputes a cell after the cells it reads.</li>
+              <li>A curriculum offers a course after its prerequisites.</li>
+              <li>A migration creates a table after the tables it points to.</li>
+              <li>A frame of a game runs a pass after the passes that fill its inputs.</li>
+              <li>A craft unlocks a recipe after the recipes that produce its ingredients.</li>
+            </ul>
+            <p>The harbor gate, the orrery, and the press are the same ledger. If the arrows form a loop, there is no legal order. Finding the loop is the useful half of the algorithm.</p>
+          </details>
+          <p class="footnote">Space steps. Escape stops a run. Click a glowing piece to seat it yourself.</p>
+        </div>
+      </aside>
+    </main>
+  </div>
+  <noscript><p class="noscript">First Light keeps its ledger in JavaScript. Enable it to seat the orrery.</p></noscript>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
