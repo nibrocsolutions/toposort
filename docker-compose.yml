@@ -1,0 +1,5 @@
+services:
+  first-light:
+    build: .
+    ports:
+      - "8052:8052"

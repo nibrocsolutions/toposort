@@ -1,0 +1,8 @@
+{
+  "name": "first-light",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test topo.test.js"
+  }
+}
